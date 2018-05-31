@@ -1,0 +1,339 @@
+[BatchAccountUrl]
+Type=string
+Category=Batch Credentials
+CategoryOrder=1
+Index=0
+Label=Batch Account URL
+Default=
+Required=True
+Description=The batch account URL.
+
+[BatchSPTenantId]
+Type=string
+Category=Batch Credentials
+CategoryOrder=1
+Index=1
+Label=Batch SP Tenant ID
+Default=
+Required=True
+Description=The tenant ID your AAD application is registered in.
+
+[BatchSPAppId]
+Type=string
+Category=Batch Credentials
+CategoryOrder=1
+Index=2
+Label=Batch SP App ID
+Default=
+Required=True
+Description=The AAD application Id.
+
+[BatchSPAppKey]
+Type=password
+Category=Batch Credentials
+CategoryOrder=1
+Index=3
+Label=Batch SP App Key
+Default=
+Required=True
+Description=The AAD application key.
+
+
+
+[KVName]
+Type=string
+Category=Key Vault Credentials
+CategoryOrder=2
+Index=0
+Label=Key Vault Name
+Default=
+Required=True
+Description=The Key Vault name from the Azure portal
+
+[KVSPTenantId]
+Type=string
+Category=Key Vault Credentials
+CategoryOrder=2
+Index=1
+Label=Key Vault SP Tenant ID
+Default=
+Required=True
+Description=The tenant ID your AAD application is registered in.
+
+[KVSPAppId]
+Type=string
+Category=Key Vault Credentials
+CategoryOrder=2
+Index=2
+Label=Key Vault SP App ID
+Default=
+Required=True
+Description=The AAD application Id.
+
+[KVSPCertThumbprint]
+Type=string
+Category=Key Vault Credentials
+CategoryOrder=2
+Index=3
+Label=Key Vault SP Cert Thumbprint
+Default=
+Required=True
+Description=The SP certificate thumbprint.
+
+
+[DomainName]
+Type=string
+Category=Domain
+CategoryOrder=3
+Index=0
+Label=Domain Name
+Default=
+Required=True
+Description=Optional fully qualified domain name if slaves should be domain joined
+
+[DomainOUPath]
+Type=string
+Category=Domain
+CategoryOrder=3
+Index=1
+Label=Domain OU Path
+Default=
+Required=True
+Description=Optional domain OU Path
+
+
+[SubnetResourceId]
+Type=string
+Category=Networking
+CategoryOrder=4
+Index=0
+Label=Subnet Resource Id
+Default=
+Required=True
+Description=Optional Azure subnet resource Id, e.g. '/subscriptions/{Subscription ID}/resourceGroups/{My Resource group}/providers/Microsoft.Network/virtualNetworks/{My VNet}/subnets/{My Subnet}'
+
+[SMBNetworkShares]
+Type=MultiLineString
+Category=Networking
+CategoryOrder=4
+Index=1
+Label=SMB Network Shares
+Default=
+Required=True
+Description=Optional semi-colon delimited list of SMB network shares to mount, e.g. \\Host\Share=X:;\\OtherHost\OtherShare=Z: (Windows) or //Host/Share=/mnt/share;//OtherHost/OtherShare=/mnt/othershare (Linux)
+
+[NFSNetworkShares]
+Type=MultiLineString
+Category=Networking
+CategoryOrder=4
+Index=1
+Label=NFS Network Shares
+Default=
+Required=True
+Description=Optional semi-colon delimited list of NFS network shares to mount, e.g. \\Host\Share=X:;\\OtherHost\OtherShare=Z: (Windows) or Host:/Share=/mnt/share;OtherHost:/OtherShare=/mnt/othershare (Linux)
+
+[DisableRemoteAccess]
+Type=boolean
+Category=Networking
+CategoryOrder=4
+Index=2
+Label=Disable Remote Access
+Default=True
+Required=True
+Description=Optional semi-colon delimited list of network shares to mount, e.g. //Host/Share=X:;//OtherHost/OtherShare=Z:
+
+
+[VMSizes]
+Type=string
+Category=VM Config
+CategoryOrder=5
+Index=0
+Label=VM Sizes
+Default=Standard_D2_v2;Standard_D3_v2;Standard_F8;Standard_F16
+Description=List of Azure VM sizes.
+
+[UseLowPriorityVMs]
+Type=boolean
+Category=VM Config
+CategoryOrder=5
+Index=1
+Label=Use Low Priority
+Default=False
+Description=If true, low priority VMs will be used
+
+[WindowsStartTaskUrl]
+Type=string
+Category=VM Config
+CategoryOrder=5
+Index=2
+Label=Windows Start Task Url
+Default=https://deadlinecbswestus2.blob.core.windows.net/scripts/deadline-starttask.ps1?sp=rl&st=2018-04-08T14%3A54%3A00Z&se=2019-04-10T14%3A54%3A00Z&sv=2017-04-17&sig=JH1s%2FV%2FgJEt%2BVGpLo4eQ52kemVtiGAQ%2FMhaUBYl7TaA%3D&sr=b
+Description=Start Task Url to configure the VMs
+
+[LinuxStartTaskUrl]
+Type=string
+Category=VM Config
+CategoryOrder=5
+Index=3
+Label=Linux Start Task Url
+Default=https://deadlinecbswestus2.blob.core.windows.net/scripts/deadline-starttask.sh?sp=rl&st=2018-04-17T15%3A09%3A00Z&se=2020-04-19T15%3A09%3A00Z&sv=2017-04-17&sig=RsTrkbLsiobmmQbxUw8y4G9%2BALedNLTtPN7yf3eRETs%3D&sr=b
+Description=Start Task Url to configure the VMs
+
+[ApplicationLicenses]
+Type=string
+Category=VM Config
+CategoryOrder=5
+Index=4
+Label=Application Licenses
+Default=3dsmax;maya;vray;arnold
+Description=Optional semi-colon delimited list of application licenses
+
+[AzureRegion]
+Type=string
+Category=VM Config
+CategoryOrder=5
+Index=5
+Label=Azure Region
+Default=
+Description=The Azure region the Batch account resides in.
+
+
+[DeadlineRepositoryShareOrPathWindows]
+Type=string
+Category=Deadline Config
+CategoryOrder=6
+Index=0
+Label=Windows Repository Path
+Default=
+Description=Deadline repository NFS server:share or Windows UNC path
+
+[DeadlineRepositoryShareOrPathLinux]
+Type=string
+Category=Deadline Config
+CategoryOrder=6
+Index=0
+Label=Linux Repository Path
+Default=
+Description=Deadline repository mount point
+
+[DeadlineRegion]
+Type=string
+Category=Deadline Config
+CategoryOrder=6
+Index=1
+Label=Region
+Default=
+Description=The Deadline Region this config is for
+
+[DeadlineCloudRegion]
+Type=string
+Category=Deadline Config
+CategoryOrder=6
+Index=1
+Label=Cloud Region
+Default=
+Description=The Deadline Cloud Region this config is for
+
+[DeadlineLicenseServer]
+Type=string
+Category=Deadline Config
+CategoryOrder=6
+Index=2
+Label=License Server
+Default=
+Description=Optional Deadline license server
+
+[DeadlineLicenseMode]
+Type=enum
+Values=Standard;UsageBased;LicenseFree
+Category=Deadline Config
+CategoryOrder=6
+Index=3
+Label=License Mode
+Default=Standard
+Required=True
+Description=Deadline license mode
+
+[DeadlineGroups]
+Type=MultiLineString
+Category=Deadline Config
+CategoryOrder=6
+Index=4
+Label=Groups
+Default=
+Required=True
+Description=Semi-colon sepThe Deadline groups the instances should be added to
+
+[DeadlinePools]
+Type=MultiLineString
+Category=Deadline Config
+CategoryOrder=6
+Index=5
+Label=Pools
+Default=
+Required=True
+Description=The Deadline pools the instances should be added to
+
+
+[ManagedImageId1]
+Type=string
+Category=First Image
+CategoryOrder=7
+Index=0
+Label=Managed Image Id
+Default=
+Required=True
+Description=Optional managed image id, e.g. /subscriptions/{Subscription ID}/resourceGroups/{My Resource group}/providers/Microsoft.Compute/images/{My Image}
+
+[ManagedImageOs1]
+Type=enum
+Values=Windows;CentOS7;Ubuntu14.04;Ubuntu16.04;Debian8
+Category=First Image
+CategoryOrder=7
+Index=1
+Label=Operating system
+Default=Windows
+Required=True
+Description=Managed image operating system.
+
+[ManagedImageId2]
+Type=string
+Category=Second Image
+CategoryOrder=7
+Index=2
+Label=Managed Image Id
+Default=
+Required=True
+Description=Optional managed image id, e.g. /subscriptions/{Subscription ID}/resourceGroups/{My Resource group}/providers/Microsoft.Compute/images/{My Image}
+
+[ManagedImageOs2]
+Type=enum
+Values=Windows;CentOS7;Ubuntu14.04;Ubuntu16.04;Debian8
+Category=Second Image
+CategoryOrder=7
+Index=3
+Label=Operating system
+Default=Windows
+Required=True
+Description=Managed image operating system.
+
+
+[ApplicationInsightsAppId]
+Type=string
+Category=Application Insights
+CategoryOrder=8
+Index=0
+Label=Application Key
+Default=
+Required=True
+Description=Optional application insights application key
+
+[ApplicationInsightsInstrumentationKey]
+Type=string
+Category=Application Insights
+CategoryOrder=8
+Index=0
+Label=Instrumentation Key
+Default=
+Required=True
+Description=Optional application insights instrumentation key

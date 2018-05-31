@@ -1,0 +1,2 @@
+azure-common==1.1.11
+azure-batch==4.0.0
