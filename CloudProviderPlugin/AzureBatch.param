@@ -167,7 +167,7 @@ Category=VM Config
 CategoryOrder=5
 Index=2
 Label=Windows Start Task Url
-Default=https://deadlinecbswestus2.blob.core.windows.net/scripts/deadline-starttask.ps1?sp=rl&st=2018-04-08T14%3A54%3A00Z&se=2019-04-10T14%3A54%3A00Z&sv=2017-04-17&sig=JH1s%2FV%2FgJEt%2BVGpLo4eQ52kemVtiGAQ%2FMhaUBYl7TaA%3D&sr=b
+Default=https://raw.githubusercontent.com/Azure/azure-deadline/master/CloudProviderPlugin/Scripts/deadline-starttask.ps1
 Description=Start Task Url to configure the VMs
 
 [LinuxStartTaskUrl]
@@ -176,7 +176,7 @@ Category=VM Config
 CategoryOrder=5
 Index=3
 Label=Linux Start Task Url
-Default=https://deadlinecbswestus2.blob.core.windows.net/scripts/deadline-starttask.sh?sp=rl&st=2018-04-17T15%3A09%3A00Z&se=2020-04-19T15%3A09%3A00Z&sv=2017-04-17&sig=RsTrkbLsiobmmQbxUw8y4G9%2BALedNLTtPN7yf3eRETs%3D&sr=b
+Default=https://raw.githubusercontent.com/Azure/azure-deadline/master/CloudProviderPlugin/Scripts/deadline-starttask.sh
 Description=Start Task Url to configure the VMs
 
 [ApplicationLicenses]
