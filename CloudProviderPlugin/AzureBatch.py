@@ -593,7 +593,7 @@ class Batch:
 
         pool.start_task = batchmodels.StartTask(
             command_line=starttask_cmd,
-            constraints=batchmodels.TaskConstraints(max_task_retry_count=3),
+            max_task_retry_count=3,
             user_identity=batchmodels.UserIdentity(
                 auto_user=batchmodels.AutoUserSpecification(
                     scope=batchmodels.AutoUserScope.pool,
