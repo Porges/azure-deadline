@@ -130,7 +130,7 @@ If using a domain, the VNet will need to be configured to use the same DNS serve
 As a prerequisite to installing the plugin several Python dependencies need to be installed and packaged into the Deadline 'pythonsync.zip' archive.  This ZIP contains all dependent Python modules required by the plugins and is consumed by all clients and render slaves.
 
 ```
-D:\DeadlineRepository10\pythonsync\pythonsync.zip
+C:\DeadlineRepository10\pythonsync\pythonsync.zip
 ```
 
 ### Install Python 2.7
