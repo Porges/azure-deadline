@@ -26,6 +26,7 @@ import sys
 import time
 import os.path
 import traceback
+import uuid
 
 from Deadline.Scripting import *
 from Deadline.Cloud import CloudPluginWrapper, CloudInstance, InstanceStatus, OSImage, HardwareType
@@ -161,7 +162,7 @@ class AzureBatchCloudPlugin(CloudPluginWrapper):
 
     def GetHostname(self, instanceID):
         ClientUtils.LogText('GetHostname for {}'.format(instanceID))
-    
+
         if instanceID == None or len(instanceID) == 0:
             return ""
 
@@ -218,27 +219,29 @@ class AzureBatchCloudPlugin(CloudPluginWrapper):
 
         ClientUtils.LogText('Looking for existing pool {}'.format(pool_id))
 
+        os_images = self.GetAvailableOSImages()
+        os_image = next((x for x in os_images if x.ID == imageID), None)
+
+        if not os_image:
+            ClientUtils.LogText('Failed to find image for id {}'.format(imageID))
+            return startedInstances
+
+        is_linux_pool = False
+        if os_image.Platform == Environment2.OS.Linux:
+            is_linux_pool = True
+
         pool = client.get_pool(pool_id)
         if not pool:
             ClientUtils.LogText('Did not find existing pool {}, creating new one'.format(pool_id))
 
-            os_images = self.GetAvailableOSImages()
-            os_image = next((x for x in os_images if x.ID == imageID), None)
-
-            if not os_image:
-                ClientUtils.LogText('Failed to find image for id {}'.format(imageID))
-                return startedInstances
-
             batch_image_spec = images.image_id_to_image_spec(self.batch_config, imageID)
 
-            is_linux_pool = False
             if os_image.Platform == Environment2.OS.Windows:
                 starttask_url = self.batch_config.windows_start_task_url
                 starttask_script = 'deadline-starttask.ps1'
             else:
                 starttask_url = self.batch_config.linux_start_task_url
                 starttask_script = 'deadline-starttask.sh'
-                is_linux_pool = True
 
             app_pkgs = [batchmodels.ApplicationPackageReference('DeadlineClient')]
             starttask_cmd = get_deadline_starttask_cmd(self.batch_config, starttask_script, os_image)
@@ -247,10 +250,13 @@ class AzureBatchCloudPlugin(CloudPluginWrapper):
             if self.batch_config.app_licenses:
                 app_licenses = self.batch_config.app_licenses.split(';')
 
+            dedicated_nodes = 0 if use_low_priority else count
+            low_prio_nodes = count if use_low_priority else 0
+
             client.create_pool(pool_id,
                                hardwareID,
-                               0 if use_low_priority else count,
-                               count if use_low_priority else 0,
+                               dedicated_nodes,
+                               low_prio_nodes,
                                batch_image_spec,
                                starttask_cmd,
                                starttask_url,
@@ -264,7 +270,8 @@ class AzureBatchCloudPlugin(CloudPluginWrapper):
                                app_insights_instrumentation_key=self.batch_config.app_insights_instrumentation_key)
 
             if self.batch_config.app_licenses:
-                client.create_job(pool_id, pool_id, is_linux_pool)
+                total_nodes = dedicated_nodes + low_prio_nodes
+                client.create_job(pool_id, pool_id, total_nodes, is_linux_pool)
 
         else:
             current_dedicated = pool.target_dedicated_nodes
@@ -279,6 +286,10 @@ class AzureBatchCloudPlugin(CloudPluginWrapper):
                 client.resize_pool(pool_id,
                                    target_dedicated=current_dedicated if use_low_priority else count,
                                    target_low_priority=count if use_low_priority else current_low_prio)
+
+                if self.batch_config.app_licenses:
+                    total_nodes = current_dedicated + current_low_prio
+                    client.create_job(pool_id, pool_id, total_nodes, is_linux_pool)
             except:
                 traceback.print_exc()
 
@@ -407,10 +418,10 @@ def get_deadline_starttask_cmd(batch_config, starttask_script, os_image):
 
         if batch_config.nfs_network_shares:
             deadline_cmd += ' -nfsShares \'{}\''.format(batch_config.nfs_network_shares)
-            
+
         if batch_config.deadline_groups:
            deadline_cmd += ' -deadlineGroups \'{}\''.format(batch_config.deadline_groups)
-           
+
         if batch_config.deadline_pools:
            deadline_cmd += ' -deadlinePools \'{}\''.format(batch_config.deadline_pools)
     else:
@@ -442,10 +453,10 @@ def get_deadline_starttask_cmd(batch_config, starttask_script, os_image):
 
         if batch_config.domain_name:
             deadline_cmd += ' --domainName "{}"'.format(batch_config.domain_name)
-            
+
         if batch_config.deadline_groups:
            deadline_cmd += ' --deadlineGroups "{}"'.format(batch_config.deadline_groups)
-           
+
         if batch_config.deadline_pools:
            deadline_cmd += ' --deadlinePools "{}"'.format(batch_config.deadline_pools)
 
@@ -462,25 +473,37 @@ class Batch:
         client = self._get_batch_client()
         return client.pool.list()
 
-    def create_job(self, job_id, pool_id, is_linux_pool):
+    def create_job(self, job_id, pool_id, total_nodes, is_linux_pool):
         client = self._get_batch_client()
         try:
             pool_info = batchmodels.PoolInformation(pool_id=pool_id)
             job = batchmodels.JobAddParameter(
                 id=job_id,
-                pool_info=pool_info,
-                on_all_tasks_complete=batchmodels.OnAllTasksComplete.terminate_job
+                pool_info=pool_info
             )
-            client.job.add(job)
+
+            try:
+                client.job.add(job)
+            except batchmodels.BatchErrorException as be:
+                if be.error and be.error.code == 'JobExists':
+                    pass
+                else:
+                    print('Error creating job, code={}, message={}'.format(be.error.code, be.error.message))
+                    raise
 
             if is_linux_pool:
-                cmd_line = '/bin/bash -c \'echo "export AZ_BATCH_ACCOUNT_URL=$AZ_BATCH_ACCOUNT_URL" > /etc/profile.d/ses.sh; echo "export AZ_BATCH_SOFTWARE_ENTITLEMENT_TOKEN=$AZ_BATCH_SOFTWARE_ENTITLEMENT_TOKEN" >> /etc/profile.d/ses.sh; sleep 604800\''
+                cmd_line = '/bin/bash -c azure-batch-ses.sh'
+                script = 'azure-batch-ses.sh'
+                script_url = 'https://raw.githubusercontent.com/Azure/azure-deadline/master/CloudProviderPlugin/Scripts/azure-batch-ses.sh'
             else:
-                cmd_line = 'powershell.exe -command [Environment]::SetEnvironmentVariable(\\\"AZ_BATCH_ACCOUNT_URL\\\", \\\"$env:AZ_BATCH_ACCOUNT_URL\\\",\\\"Machine\\\"); [Environment]::SetEnvironmentVariable(\\\"AZ_BATCH_SOFTWARE_ENTITLEMENT_TOKEN\\\", \\\"$env:AZ_BATCH_SOFTWARE_ENTITLEMENT_TOKEN\\\",\\\"Machine\\\"); net stop deadline10launcherservice; Start-Sleep -Seconds 20; net start deadline10launcherservice; Start-Sleep -Seconds 604800'
+                cmd_line = 'powershell.exe -file azure-batch-ses.ps1'
+                script = 'azure-batch-ses.ps1'
+                script_url = 'https://raw.githubusercontent.com/Azure/azure-deadline/master/CloudProviderPlugin/Scripts/azure-batch-ses.ps1'
 
             task = batchmodels.TaskAddParameter(
-                id="1",
+                id='',
                 command_line=cmd_line,
+                resource_files=[batchmodels.ResourceFile(script_url, script)],
                 constraints=batchmodels.TaskConstraints(max_task_retry_count=3),
                 user_identity=batchmodels.UserIdentity(
                     auto_user=batchmodels.AutoUserSpecification(
@@ -489,8 +512,8 @@ class Batch:
                     ))
             )
 
-            for i in range(25):
-                task.id = str(i)
+            for i in range(total_nodes):
+                task.id = str(uuid.uuid4())
                 client.task.add(job_id=job.id, task=task)
 
         except batchmodels.BatchErrorException as be:
@@ -610,7 +633,6 @@ class Batch:
             ]
 
         if subnet_id:
-            print('Using subnet {}'.format(subnet_id))
             pool.network_configuration = batchmodels.NetworkConfiguration(
                 subnet_id=subnet_id
             )
