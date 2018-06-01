@@ -53,9 +53,14 @@ class AzureDataTransfer (DeadlineEventListener):
         if not self.should_sync_assets(job):
             self.LogInfo('Skipping data transfer, job does not use an enabled group or pool.')
             return
-        
+
+        syncDirection = self.GetConfigEntry('SyncDirection')
+        if syncDirection == 'UploadOnly':
+            self.LogInfo('Skipping data transfer, upload only sync specified.')
+            return
+
         self.LogInfo('Downloading assets for job {} on slave {}'.format(job, slaveName))
-        
+
         accountName = self.GetConfigEntry('BlobStorageAccountName')
         accountKey = self.GetConfigEntry('BlobStorageAccountKey')
         sourceFolders = self.GetConfigEntryWithDefault('SourceFolders', None)
@@ -71,11 +76,11 @@ class AzureDataTransfer (DeadlineEventListener):
         if not accountKey:
             self.LogInfo('No account key set in the event configuration')
             return
-            
+
         if not sourceFolders:
             self.LogInfo('No source folders set in the event configuration')
             return
-            
+
         if not destinationContainer:
             self.LogInfo('No destination folders set in the event configuration')
             return
@@ -83,57 +88,60 @@ class AzureDataTransfer (DeadlineEventListener):
         if not destinationFolder:
             self.LogInfo('No destination folder set in the event configuration')
             return
-            
+
         destinationFolder = os.path.expandvars(destinationFolder)
-            
+
         azcopyExecutable = self.get_azcopy_cmd()
         args = self.get_azcopy_download_args(
             destinationFolder, accountName, accountKey, destinationContainer)
-            
-        self.LogInfo('Executing {} {}'.format(azcopyExecutable, args))
+
         start = time.time()
         exit_code = self.RunProcess(azcopyExecutable, args, os.environ['TEMP'], -1)
         self.LogInfo('Downloaded container {} to folder {} in {} seconds with exit code {}'.format(
             destinationContainer, destinationFolder, (time.time() - start), exit_code))
-                
+
 
     # This is called when a Slave starts a job.
     def OnJobSubmitted(self, job):
-    
+
         if not self.should_sync_assets(job):
             self.LogInfo('Skipping data transfer, job does not use an enabled group or pool.')
+            return
+
+        syncDirection = self.GetConfigEntry('SyncDirection')
+        if syncDirection == 'DownloadOnly':
+            self.LogInfo('Skipping data transfer, download only sync specified.')
             return
 
         accountName = self.GetConfigEntry('BlobStorageAccountName')
         accountKey = self.GetConfigEntry('BlobStorageAccountKey')
         sourceFolders = self.GetConfigEntryWithDefault('SourceFolders', '')
         destinationContainer = self.GetConfigEntry('DestinationContainer')
-        
+
         if not accountName:
             self.LogInfo('No account name set in the event configuration')
             return
-            
+
         if not accountKey:
             self.LogInfo('No account key set in the event configuration')
             return
-            
+
         if not sourceFolders:
             self.LogInfo('No source folders set in the event configuration')
             return
-            
+
         if not destinationContainer:
             self.LogInfo('No destination folders set in the event configuration')
             return
 
         sourceFolderList = sourceFolders.split(';')
-        
+
         for sourceFolder in sourceFolderList:
             if not self.usable_path_for_os(sourceFolder):
                 continue
             azcopyExecutable = self.get_azcopy_cmd()
             args = self.get_azcopy_upload_args(
                 sourceFolder, accountName, accountKey, destinationContainer)
-            self.LogInfo('Executing {} {}'.format(azcopyExecutable, args))
             start = time.time()
             exit_code = self.RunProcess(azcopyExecutable, args, os.environ['TEMP'], -1)
             self.LogInfo('Uploaded {} to container {} in {} seconds with exit code {}'.format(
@@ -142,10 +150,10 @@ class AzureDataTransfer (DeadlineEventListener):
     def get_azcopy_cmd(self):
         if platform.system() is 'Windows':
             paths = [
-                '{}\Microsoft SDKs\Azure\AzCopy\AzCopy.exe'.format(os.environ['ProgramFiles(x86)']), 
+                '{}\Microsoft SDKs\Azure\AzCopy\AzCopy.exe'.format(os.environ['ProgramFiles(x86)']),
                 '{}\Microsoft SDKs\Azure\AzCopy\AzCopy.exe'.format(os.environ['ProgramFiles'])]
 
-            azcopyExecutable = 'AzCopy'    
+            azcopyExecutable = 'AzCopy'
             for path in paths:
                 self.LogInfo('Checking for AzCopy {}'.format(path))
                 if os.path.isfile(path):
@@ -157,9 +165,9 @@ class AzureDataTransfer (DeadlineEventListener):
             msg = 'Unsupported operating system {}'.format(platform.system())
             self.LogInfo(msg)
             raise RuntimeError(msg)
-            
+
         return azcopyExecutable
-        
+
     def get_azcopy_upload_args(self, sourceFolder, accountName, accountKey, destinationContainer):
         journal_folder = os.path.join(os.environ['TEMP'], hashlib.md5(sourceFolder).hexdigest())
         head, tail = os.path.split(sourceFolder)
@@ -183,47 +191,47 @@ class AzureDataTransfer (DeadlineEventListener):
                 accountName, sourceContainer, destinationFolder, accountKey, journal_folder)
         elif platform.system() is 'Linux':
             args = '--source https://{}.blob.core.windows.net/{} --destination \"{}\" --source-key {} -z {} -mt -xn -s -y'.format(
-                    accountName, sourceContainer, destinationFolder, accountKey, journal_folder) 
+                    accountName, sourceContainer, destinationFolder, accountKey, journal_folder)
         else:
             msg = 'Unsupported operating system {}'.format(platform.system())
             self.LogInfo(msg)
             raise RuntimeError(msg)
         return args
-    
+
     def usable_path_for_os(self, path):
         if self.windows_path(path) and platform.system() is 'Windows':
             return True
         if not self.windows_path(path) and platform.system() is 'Linux':
             return True
         return False
-    
+
     def windows_path(self, path):
         if path.startswith('\\'):
             return True
         if ':' in path:
             return True
         return False
-        
+
     def get_job_working_dir(self, slaveName, jobId):
         return '{}\Thinkbox\Deadline10\slave\{}\jobsData\{}'.format(os.environ['LOCALAPPDATA'], slaveName, job.JobId)
-    
+
     def should_sync_assets(self, job):
         enabledGroups = self.GetConfigEntryWithDefault('EnabledGroups', None)
         enabledPools = self.GetConfigEntryWithDefault('EnabledPools', None)
-        
+
         enabledGroupsList = []
         enabledPoolsList = []
-        
+
         if enabledGroups:
             enabledGroupsList = enabledGroups.split(';')
-            
+
         if enabledPools:
             enabledPoolsList = enabledPools.split(';')
-            
+
         if job.JobGroup in enabledGroupsList:
             return True
-            
+
         if job.JobPool in enabledPoolsList or job.JobSecondaryPool in enabledPoolsList:
             return True
-            
+
         return False

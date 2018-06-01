@@ -4,51 +4,89 @@ Items=Global Enabled;Opt-In;Disabled
 Label=State
 Default=Disabled
 Description=How this event plug-in should respond to events. If Global, all jobs and Slaves will trigger the events for this plugin. If Opt-In, jobs and Slaves can choose to trigger the events for this plugin. If Disabled, no events are triggered for this plugin.
+Category=Plugin
+CategoryOrder=0
+Index=0
 
 [EnabledGroups]
 Type=MultiLineString
 Label=Groups
 Description=The groups that require asset transfer
 Default=
+Category=Enabled Groups and Pools
+CategoryOrder=1
+Index=0
 
 [EnabledPools]
 Type=MultiLineString
 Label=Pools
 Description=The pools that require asset transfer
 Default=
+Category=Enabled Groups and Pools
+CategoryOrder=1
+Index=1
 
 [BlobStorageAccountName]
 Type=string
 Label=Account Name
 Description=The Azure Blob storage account name
 Default=
+Category=Storage Account
+CategoryOrder=2
+Index=0
 
 [BlobStorageAccountKey]
 Type=password
 Label=Account Key
 Description=The Azure Blob storage account key
 Default=
+Category=Storage Account
+CategoryOrder=2
+Index=1
 
 [DestinationContainer]
 Type=string
 Label=Destination Container
 Description=Destination Azure Blob container where assets will be synced
 Default=
+Category=Storage Account
+CategoryOrder=2
+Index=2
+
+[SyncDirection]
+Type=enum
+Values=Bidirectional;DownloadOnly;UploadOnly
+Label=Synchronization Direction
+Default=Bidirectional
+Required=True
+Description=Direction of synchronization to Azure blob storage
+Category=Storage Account
+CategoryOrder=2
+Index=3
 
 [SourceFolders]
 Type=MultiLineMultiFolder
-Label=Source Folders
-Description=Source folders to sync
+Label=Source Folders and Shares
+Description=Folders and network shares to sync to Blob storage
 Default=
+Category=Folders
+CategoryOrder=3
+Index=0
 
 [DestinationFolderWindows]
 Type=string
-Label=Windows Download Path
+Label=Windows Slave Download Path
 Description=The path on the slave where the source folders will be downloaded too.
 Default=
+Category=Folders
+CategoryOrder=3
+Index=1
 
 [DestinationFolderLinux]
 Type=string
-Label=Linux Download Path
+Label=Linux Slave Download Path
 Description=The path on the slave where the source folders will be downloaded too.
 Default=
+Category=Folders
+CategoryOrder=3
+Index=2

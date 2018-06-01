@@ -284,8 +284,8 @@ class AzureBatchCloudPlugin(CloudPluginWrapper):
 
             try:
                 client.resize_pool(pool_id,
-                                   target_dedicated=current_dedicated if use_low_priority else count,
-                                   target_low_priority=count if use_low_priority else current_low_prio)
+                                   target_dedicated=current_dedicated,
+                                   target_low_priority=current_low_prio)
 
                 if self.batch_config.app_licenses:
                     total_nodes = current_dedicated + current_low_prio
@@ -419,11 +419,11 @@ def get_deadline_starttask_cmd(batch_config, starttask_script, os_image):
         if batch_config.nfs_network_shares:
             deadline_cmd += ' -nfsShares \'{}\''.format(batch_config.nfs_network_shares)
 
-        if batch_config.deadline_groups:
-           deadline_cmd += ' -deadlineGroups \'{}\''.format(batch_config.deadline_groups)
+        if batch_config.deadline_windows_groups:
+           deadline_cmd += ' -deadlineGroups \'{}\''.format(batch_config.deadline_windows_groups)
 
-        if batch_config.deadline_pools:
-           deadline_cmd += ' -deadlinePools \'{}\''.format(batch_config.deadline_pools)
+        if batch_config.deadline_windows_pools:
+           deadline_cmd += ' -deadlinePools \'{}\''.format(batch_config.deadline_windows_pools)
     else:
         deadline_cmd = '/bin/bash -c \'{} ' \
                        '--tenantId "{}" ' \
@@ -454,11 +454,11 @@ def get_deadline_starttask_cmd(batch_config, starttask_script, os_image):
         if batch_config.domain_name:
             deadline_cmd += ' --domainName "{}"'.format(batch_config.domain_name)
 
-        if batch_config.deadline_groups:
-           deadline_cmd += ' --deadlineGroups "{}"'.format(batch_config.deadline_groups)
+        if batch_config.deadline_linux_groups:
+           deadline_cmd += ' --deadlineGroups "{}"'.format(batch_config.deadline_linux_groups)
 
-        if batch_config.deadline_pools:
-           deadline_cmd += ' --deadlinePools "{}"'.format(batch_config.deadline_pools)
+        if batch_config.deadline_linux_pools:
+           deadline_cmd += ' --deadlinePools "{}"'.format(batch_config.deadline_linux_pools)
 
         deadline_cmd += '\''
 

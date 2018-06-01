@@ -254,25 +254,46 @@ Default=Standard
 Required=True
 Description=Deadline license mode
 
-[DeadlineGroups]
-Type=MultiLineString
+[WindowsDeadlineGroups]
+Type=string
 Category=Deadline Config
 CategoryOrder=6
 Index=4
-Label=Groups
+Label=Windows Groups
 Default=
 Required=True
-Description=Semi-colon sepThe Deadline groups the instances should be added to
+Description=Semi-colon separated list of Deadline pools the instances should be added to
 
-[DeadlinePools]
-Type=MultiLineString
+[WindowsDeadlinePools]
+Type=string
 Category=Deadline Config
 CategoryOrder=6
 Index=5
-Label=Pools
+Label=Windows Pools
 Default=
 Required=True
-Description=The Deadline pools the instances should be added to
+Description=Semi-colon separated list of Deadline pools the instances should be added to
+
+
+[LinuxDeadlineGroups]
+Type=string
+Category=Deadline Config
+CategoryOrder=6
+Index=4
+Label=Linux Groups
+Default=
+Required=True
+Description=Semi-colon separated list of Deadline pools the instances should be added to
+
+[LinuxDeadlinePools]
+Type=string
+Category=Deadline Config
+CategoryOrder=6
+Index=5
+Label=Linux Pools
+Default=
+Required=True
+Description=Semi-colon separated list of Deadline pools the instances should be added to
 
 
 [ManagedImageId1]

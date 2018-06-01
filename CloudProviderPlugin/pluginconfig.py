@@ -70,8 +70,10 @@ def load_config(cloud_plugin_wrapper):
             deadline_cloud_region=cloud_plugin_wrapper.GetConfigEntry("DeadlineCloudRegion"),  # Used as a moniker to separate pools
             deadline_license_server=cloud_plugin_wrapper.GetConfigEntryWithDefault("DeadlineLicenseServer", None),
             deadline_license_mode=cloud_plugin_wrapper.GetConfigEntry("DeadlineLicenseMode"),
-            deadline_groups=cloud_plugin_wrapper.GetConfigEntryWithDefault("DeadlineGroups", None),
-            deadline_pools=cloud_plugin_wrapper.GetConfigEntryWithDefault("DeadlinePools", None),
+            deadline_windows_groups=cloud_plugin_wrapper.GetConfigEntryWithDefault("WindowsDeadlineGroups", None),
+            deadline_windows_pools=cloud_plugin_wrapper.GetConfigEntryWithDefault("WindowsDeadlinePools", None),
+            deadline_linux_groups=cloud_plugin_wrapper.GetConfigEntryWithDefault("LinuxDeadlineGroups", None),
+            deadline_linux_pools=cloud_plugin_wrapper.GetConfigEntryWithDefault("LinuxDeadlinePools", None),
 
             # Images
             managed_image_id_1=cloud_plugin_wrapper.GetConfigEntryWithDefault("ManagedImageId1", None),
@@ -123,8 +125,10 @@ class BatchPluginConfig:
                  deadline_cloud_region,
                  deadline_license_server,
                  deadline_license_mode,
-                 deadline_groups,
-                 deadline_pools,
+                 deadline_windows_groups,
+                 deadline_windows_pools,
+                 deadline_linux_groups,
+                 deadline_linux_pools,
 
                  managed_image_id_1,
                  managed_image_os_1,
@@ -167,8 +171,10 @@ class BatchPluginConfig:
         self.deadline_cloud_region = deadline_cloud_region
         self.deadline_license_server = deadline_license_server
         self.deadline_license_mode = deadline_license_mode
-        self.deadline_groups = deadline_groups
-        self.deadline_pools = deadline_pools
+        self.deadline_windows_groups = deadline_windows_groups
+        self.deadline_windows_pools = deadline_windows_pools
+        self.deadline_linux_groups = deadline_linux_groups
+        self.deadline_linux_pools = deadline_linux_pools
 
         self.managed_image_id_1 = managed_image_id_1
         self.managed_image_os_1 = managed_image_os_1
