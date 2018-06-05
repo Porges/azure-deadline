@@ -100,6 +100,8 @@ Create a Resource Group - this should be created in the region you plan to provi
 Create a Azure Batch and Storage account in the above Deadline resource group. 
 The Batch account Pool Allocation mode should be 'Batch service'.
 
+* Note the Batch account URL - you can get this from the Properties pane.
+
 #### Create the Application Package
 
 The Deadline 10 client installer needs to be available for installation of the Deadline slaves, to facilitate this we'll create and upload an application packages, essentially a ZIP file that will be extracted onto the nodes.
@@ -118,14 +120,14 @@ Once uploaded, navigate to the application package by clicking on it and click t
 Now give the Batch Service Principal access to the Batch account you created above.
 Navigate to the Resource Group -> Batch Account -> Access control (IAM).  Click '+Add' and search for the Batch account Service Principal using the application Id from above.  Select the Role 'Contributor' for the service principal and click Save.
 
-* Note the Batch account URL - you can get this from the Properties pane.
-
 #### Upload the Key Vault Service Principal Certificate
 
 The Deadline slaves will need access to Key Vault to get various credentials stored there.
 To access Key Vault we'll utilise the Batch certificate store which will ensure that any required certificates are available on the Deadline slaves.
 Navigate to the Azure Batch service in the portal and Click the Certificates feature.
 Click +Add and select the Key Vault Service Principals certificate and then OK to upload.
+
+At this point you can delete your local copy of the certificate/PFX.
 
 ### Key Vault Configuration
 
