@@ -51,9 +51,9 @@ In the resource group that will be used for the Azure resources, create a Key Va
 
 Once created, note the following information for the Key Vault Service Principal
 
-1.  Tenant Id
-2.  Application/Client Id
-3.  Certificate Thumbprint
+* Tenant Id
+* Application/Client Id
+* Certificate Thumbprint
 
 The service principal certificate created above needs to be downloaded from key vault using the Azure Portal, or alternatively use the powershell command below, and saved as a PFX.
 
@@ -89,10 +89,9 @@ and add the Key Vault Service Principal application id from above, and give the 
 
 Note the following information for the Batch Service Principal
 
-1.  Tenant Id
-2.  Application/Client Id
-3.  Password (or Key)
-
+* Tenant Id
+* Application/Client Id
+* Password (or Key)
 
 ### Create the Batch and Storage
 
