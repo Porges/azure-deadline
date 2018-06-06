@@ -29,7 +29,7 @@ import clr
 sys.path.insert(0, os.environ['DEADLINE_PATH'])
 
 from FranticX import Environment2
-from config import BatchPluginConfig
+from pluginconfig import BatchPluginConfig
 
 
 def get_config():
@@ -65,8 +65,11 @@ def get_config():
         deadline_cloud_region='azurewestus',
         deadline_license_server=None,
         deadline_license_mode='Free',
-        deadline_groups='group1',
-        deadline_pools='pool1',
+
+        deadline_windows_groups='MyWindowsGroup1;MyWindowsGroup2',
+        deadline_windows_pools='MyWindowsPool',
+        deadline_linux_groups='MyLinuxGroup',
+        deadline_linux_pools='MyLinuxPool1;MyLinuxPool2',
 
         managed_image_id_1='/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyRg/providers/Microsoft.Compute/images/MyCentOsImage',
         managed_image_os_1='CentOS73',

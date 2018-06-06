@@ -96,14 +96,14 @@ def image_os_to_node_agent_sku(image_os):
 
 def image_id_to_image_spec(batch_config, image_id):
     if image_id:
-        if image_id.startswith("/subscriptions"):
-            if image_id is batch_config.managed_image_id_1:
+        if image_id.startswith("/subscriptions/"):
+            if image_id == batch_config.managed_image_id_1:
                 return BatchImageSpec(
                     node_agent_sku_id=image_os_to_node_agent_sku(
                         batch_config.managed_image_os_1),
                     image_id=image_id
                 )
-            if image_id is batch_config.managed_image_id_2:
+            if image_id == batch_config.managed_image_id_2:
                 return BatchImageSpec(
                     node_agent_sku_id=image_os_to_node_agent_sku(
                         batch_config.managed_image_os_2),

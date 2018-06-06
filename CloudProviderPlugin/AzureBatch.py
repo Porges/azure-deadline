@@ -234,7 +234,7 @@ class AzureBatchCloudPlugin(CloudPluginWrapper):
         if not pool:
             ClientUtils.LogText('Did not find existing pool {}, creating new one'.format(pool_id))
 
-            batch_image_spec = images.image_id_to_image_spec(self.batch_config, imageID)
+            batch_image_spec = images.image_id_to_image_spec(config, imageID)
 
             if os_image.Platform == Environment2.OS.Windows:
                 starttask_url = self.batch_config.windows_start_task_url

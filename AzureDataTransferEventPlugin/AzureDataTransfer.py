@@ -59,8 +59,6 @@ class AzureDataTransfer (DeadlineEventListener):
             self.LogInfo('Skipping data transfer, upload only sync specified.')
             return
 
-        self.LogInfo('Downloading assets for job {} on slave {}'.format(job, slaveName))
-
         accountName = self.GetConfigEntry('BlobStorageAccountName')
         accountKey = self.GetConfigEntry('BlobStorageAccountKey')
         sourceFolders = self.GetConfigEntryWithDefault('SourceFolders', None)
@@ -90,6 +88,8 @@ class AzureDataTransfer (DeadlineEventListener):
             return
 
         destinationFolder = os.path.expandvars(destinationFolder)
+
+        self.LogInfo('Downloading assets for job {} on slave {} to {}'.format(job, slaveName, destinationFolder))
 
         azcopyExecutable = self.get_azcopy_cmd()
         args = self.get_azcopy_download_args(
