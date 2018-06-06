@@ -197,14 +197,14 @@ class BatchPluginConfig:
             osi = OSImage()
             osi.ID = self.managed_image_id_1
             osi.Description = images.get_image_display_name(self.managed_image_id_1)
-            osi.Platform = Environment2.OS.Windows if self.managed_image_os_1 is "Windows" else Environment2.OS.Linux
+            osi.Platform = Environment2.OS.Windows if self.managed_image_os_1 == "Windows" else Environment2.OS.Linux
             os_images.append(osi)
 
         if self.managed_image_id_2:
             osi = OSImage()
             osi.ID = self.managed_image_id_2
             osi.Description = images.get_image_display_name(self.managed_image_id_2)
-            osi.Platform = Environment2.OS.Windows if self.managed_image_os_2 is "Windows" else Environment2.OS.Linux
+            osi.Platform = Environment2.OS.Windows if self.managed_image_os_2 == "Windows" else Environment2.OS.Linux
             os_images.append(osi)
 
         return os_images
