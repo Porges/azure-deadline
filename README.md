@@ -1,5 +1,5 @@
 
-# Azure Cloud Provider Plugin for Deadline 10
+# Azure Plugins for Deadline 10
 
 ## Installation
 

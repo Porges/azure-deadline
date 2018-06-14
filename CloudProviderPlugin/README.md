@@ -1,8 +1,11 @@
 # Microsoft Azure Deadline 10 Cloud Provider Plugin
 
+
+## Summary of Requirements
+
 Below outlines the steps required to setup the environment and install the plugin and dependencies.  In summary you'll need the following.
 
-**Azure VNet**
+**Azure VNet & Subnet**
 
 You’ll need a connection to Azure over Express Route or a site to site VPN and an associated VNet/subnet.  This is the network where the cloud nodes will be deployed and needs to have access to any on prem license server, and file servers if needed.
 
@@ -19,6 +22,9 @@ Azure Batch Account – this is the Batch account that will provision the Deadli
 Azure Blob Storage Account – this is used for asset transfer via blob, if required.  Asset transfer can be enabled using the Deadline Azure Data Transfer Event plugin.
 
 Key Vault – used to store the required credentials for Deadline slaves including domain users, service users, Deadline DB certs and password.
+
+Managed Image - if required, you'll need to create a managed image that contains your design and rendering software.
+Azure Batch Rendering provides a Windows and CentOS based image with 3ds Max and Maya 2018 and 2019 and the latest VRay and Arnold renderers.
 
 **Testing**
 
@@ -183,22 +189,7 @@ Now ZIP the content of %TEMP%\DeadlineAzureInstall\* into an archive called pyth
 
 ### Install the Azure Cloud Provider Plugin
 
-The Azure Batch cloud provider plugin needs to be installed on the Deadline repository host at the following location, or the repository install location if the default wasn't used.
+The Azure Batch cloud provider plugin needs to be installed to the Deadline Reposirtory as per the [installation instructions here][plugin install].
+Any machines that will execute the Azure cloud provider plugin, like the Monitor or Balancer, are required to install the plugin via the install script to insure all required dependencies are available.
 
-The 'AzureBatch' directory will need to be created.
-
-```
-C:\DeadlineRepository10\custom\cloud\AzureBatch
-```
-
-The following plugin files should be installed
-
-```
-AzureBatch.param
-AzureBatch.py
-hardware.py
-images.py
-mappers.py
-pluginconfig.py
-```
-
+[plugin install]: ../README.md
