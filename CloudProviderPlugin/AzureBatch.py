@@ -33,12 +33,17 @@ from Deadline.Cloud import CloudPluginWrapper, CloudInstance, InstanceStatus, OS
 from FranticX import Environment2
 from System.IO import *
 
+# Azure plugin dependencies
+if os.environ['AZURE_DEADLINE_PATH'] not in sys.path:
+    sys.path.insert(0, os.environ['AZURE_DEADLINE_PATH'])
+print(sys.path)
 import azure.common.credentials
 import azure.batch.batch_service_client as batchsc
 import azure.batch.models as batchmodels
 
 # Local plugin imports
-sys.path.append(os.path.join(os.path.dirname(__file__)))
+if os.path.join(os.path.dirname(__file__)) not in sys.path:
+    sys.path.insert(1, os.path.join(os.path.dirname(__file__)))
 import pluginconfig
 import mappers
 import images
