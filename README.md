@@ -9,6 +9,10 @@ On Windows execute the following from a command prompt or powershell console wit
 
 The dependencies are installed to a separate directory to avoid conflicts with the Deadline module versions.
 
+### Dependencies
+
+The installer requires Python 2.7.x.  You can download Python from [here](https://www.python.org/downloads/release/python-2715/) and install it on all systems that will be executing the cloud plugin.
+
 ### Repository Installation
 
 On Windows execute the following from a command prompt or powershell console with **Administrator** priviledges.

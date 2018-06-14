@@ -160,34 +160,9 @@ We need to add the following secrets that are required by the Deadline slaves.  
 If using a domain, the VNet will need to be configured to use the same DNS server as the AD domain controller so the Deadline slaves can resolve the domain name.
 To do this navigate to the VNet in the Azure portal and select DNS servers.  Select the Custom radio button and add the IP address of the on premise DNS server. 
 
-# Install the Cloud Provider Plugin
-
-As a prerequisite to installing the plugin several Python dependencies need to be installed and packaged into the Deadline 'pythonsync.zip' archive.  This ZIP contains all dependent Python modules required by the plugins and is consumed by all clients and Deadline slaves.
-
-```
-C:\DeadlineRepository10\pythonsync\pythonsync.zip
-```
-
-### Install Python 2.7
-You'll need to install a copy of Python 2.7 if not available.
-
 https://www.python.org/download/releases/2.7/
 
-### Install the Plugin Dependencies
-
-Start by creating a backup of pythonsync.zip by copying it somewhere safe.  Now extract the content of pythonsync.zip to a temporary location, e.g. %TEMP%\DeadlineAzureInstall.
-
-Using pip install the extra dependencies to the same location.
-
-```
-pip install --target=%TEMP%\DeadlineAzureInstall --upgrade -r requirements.txt
-```
-
-Now ZIP the content of %TEMP%\DeadlineAzureInstall\* into an archive called pythonsync.zip and copy this to you Deadline repository, e.g. D:\DeadlineRepository10\pythonsync\pythonsync.zip.  Note, when zipping do not include the root 'DeadlineAzureInstall' directory.
-
-*Note - All client machines will need to close the Deadline monitor, delete the cached version of pythonsync.zip and restart the Monitor. e.g. Delete %LOCALAPPDATA%\Thinkbox\Deadline10\cache\*
-
-### Install the Azure Cloud Provider Plugin
+### Installation
 
 The Azure Batch cloud provider plugin needs to be installed to the Deadline Reposirtory as per the [installation instructions here][plugin install].
 Any machines that will execute the Azure cloud provider plugin, like the Monitor or Balancer, are required to install the plugin via the install script to insure all required dependencies are available.
