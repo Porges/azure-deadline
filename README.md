@@ -1,6 +1,30 @@
 
-# Azure Cloud Provider Plugin for Deadline
+# Azure Cloud Provider Plugin for Deadline 10
 
+## Installation
+
+We've created an install script for the Azure plugins to simplify the process.
+
+On Windows execute the following from a command prompt or powershell console with **Administrator** priviledges.
+
+The dependencies are installed to a separate directory to avoid conflicts with the Deadline module versions.
+
+### Repository Installation
+
+On Windows execute the following from a command prompt or powershell console with **Administrator** priviledges.
+This will install the Deadline cloud provider plugin and all required dependencies.
+
+```
+powershell -exec bypass -c "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/Azure/azure-deadline/master/Scripts/install.ps1', 'install.ps1'); ./install.ps1"
+```
+
+### Client or Balancer Installation
+
+All Deadline clients have access to all plugins installed to the repository, however the Azure Deadline plugin dependencies will also need to be installed on any client computer that will load the plugin, like the Balancer or Monitor Cloud Console for example.
+
+```
+powershell -exec bypass -c "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/Azure/azure-deadline/master/Scripts/install.ps1', 'install.ps1'); ./install.ps1 -clientOnlyInstall"
+```
 
 # Contributing
 
