@@ -139,7 +139,7 @@ if (Test-Path $tempPath)
 
 Create-Directory $tempPath
 
-$version = "0.1-alpha.1"
+$version = "0.1"
 $file = "v${version}.zip"
 $url = "https://github.com/Azure/azure-deadline/archive/$file"
 $localFile = "$tempPath\$file"
