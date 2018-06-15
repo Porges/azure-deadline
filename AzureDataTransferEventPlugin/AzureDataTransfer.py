@@ -65,7 +65,7 @@ class AzureDataTransfer (DeadlineEventListener):
         destinationContainer = self.GetConfigEntry('DestinationContainer')
         destinationFolderWindows = self.GetConfigEntryWithDefault('DestinationFolderWindows', None)
         destinationFolderLinux = self.GetConfigEntryWithDefault('DestinationFolderLinux', None)
-        destinationFolder = destinationFolderWindows if platform.system() is 'Windows' else destinationFolderLinux
+        destinationFolder = destinationFolderWindows if platform.system() == 'Windows' else destinationFolderLinux
 
         if not accountName:
             self.LogInfo('No account name set in the event configuration')
@@ -103,6 +103,18 @@ class AzureDataTransfer (DeadlineEventListener):
 
     # This is called when a Slave starts a job.
     def OnJobSubmitted(self, job):
+
+        if job.JobOutputDirectories:
+            for dir in job.JobOutputDirectories:
+                self.LogInfo('Output Dir {}'.format(dir))
+        else:
+            self.LogInfo('No output dirs')
+
+        if job.JobOutputFileNames:
+            for dir in job.JobOutputFileNames:
+                self.LogInfo('Output Filename {}'.format(dir))
+        else:
+            self.LogInfo('No output filenames')
 
         if not self.should_sync_assets(job):
             self.LogInfo('Skipping data transfer, job does not use an enabled group or pool.')
@@ -148,7 +160,7 @@ class AzureDataTransfer (DeadlineEventListener):
                 sourceFolder, destinationContainer, (time.time() - start), exit_code))
 
     def get_azcopy_cmd(self):
-        if platform.system() is 'Windows':
+        if platform.system() == 'Windows':
             paths = [
                 '{}\Microsoft SDKs\Azure\AzCopy\AzCopy.exe'.format(os.environ['ProgramFiles(x86)']),
                 '{}\Microsoft SDKs\Azure\AzCopy\AzCopy.exe'.format(os.environ['ProgramFiles'])]
@@ -159,7 +171,7 @@ class AzureDataTransfer (DeadlineEventListener):
                 if os.path.isfile(path):
                     azcopyExecutable = path
                     break
-        elif platform.system() is 'Linux':
+        elif platform.system() == 'Linux':
             azcopyExecutable = 'azcopy'
         else:
             msg = 'Unsupported operating system {}'.format(platform.system())
@@ -172,10 +184,10 @@ class AzureDataTransfer (DeadlineEventListener):
         journal_folder = os.path.join(os.environ['TEMP'], hashlib.md5(sourceFolder).hexdigest())
         head, tail = os.path.split(sourceFolder)
         dest_folder = tail if not None else head
-        if platform.system() is 'Windows':
+        if platform.system() == 'Windows':
             args = '/Source:\"{}\" /Dest:https://{}.blob.core.windows.net/{}/{} /DestKey:{} /Z:{} /S /XO /Y'.format(
                 sourceFolder, accountName, destinationContainer, dest_folder, accountKey, journal_folder)
-        elif platform.system() is 'Linux':
+        elif platform.system() == 'Linux':
             args = '--source \"{}\" --destination https://{}.blob.core.windows.net/{}/{} --dest-key {} -z {} -s -y'.format(
                 sourceFolder, accountName, destinationContainer, dest_folder, accountKey, journal_folder)
         else:
@@ -186,10 +198,10 @@ class AzureDataTransfer (DeadlineEventListener):
 
     def get_azcopy_download_args(self, destinationFolder, accountName, accountKey, sourceContainer):
         journal_folder = os.path.join(os.environ['TEMP'], hashlib.md5(sourceContainer).hexdigest())
-        if platform.system() is 'Windows':
+        if platform.system() == 'Windows':
             args = '/Source:https://{}.blob.core.windows.net/{} /Dest:\"{}\" /SourceKey:{} /Z:{} /S /MT /XN /Y'.format(
                 accountName, sourceContainer, destinationFolder, accountKey, journal_folder)
-        elif platform.system() is 'Linux':
+        elif platform.system() == 'Linux':
             args = '--source https://{}.blob.core.windows.net/{} --destination \"{}\" --source-key {} -z {} -mt -xn -s -y'.format(
                     accountName, sourceContainer, destinationFolder, accountKey, journal_folder)
         else:
@@ -199,9 +211,9 @@ class AzureDataTransfer (DeadlineEventListener):
         return args
 
     def usable_path_for_os(self, path):
-        if self.windows_path(path) and platform.system() is 'Windows':
+        if self.windows_path(path) and platform.system() == 'Windows':
             return True
-        if not self.windows_path(path) and platform.system() is 'Linux':
+        if not self.windows_path(path) and platform.system() == 'Linux':
             return True
         return False
 
