@@ -1,6 +1,6 @@
 ﻿Param(
     [string]$deadlineRepositoryPath = $null,
-    [string]$installPath = "$env:ProgramFiles\Microsoft\Azure Deadline 10",
+    [string]$installPath = "$env:ProgramFiles\Microsoft\Azure Deadline",
     [switch]$clientOnlyInstall
 )
 
@@ -45,7 +45,7 @@ function Install-Plugin-Dependencies()
 {
     # Install the Azure cloud provider plugin dependencies
     Write-Host "Installing Azure Cloud Plugin dependencies to $installPath..."
-    & pip.exe install --target=$installPath --upgrade -r "$tempPath\azure-deadline-$version\CloudProviderPlugin\requirements.txt" 2>&1 | Out-File "$tempPath\pip.log"
+    & pip.exe install --target="$installPath" --upgrade -r "$tempPath\azure-deadline-$version\CloudProviderPlugin\requirements.txt" 2>&1 | Out-File "$tempPath\pip.log"
     if ($LASTEXITCODE -ne 0)
     {
         Write-Error "An error occurred installing one or more packages."
@@ -80,7 +80,7 @@ function Install-DataTransfer-Plugin()
 
 if ('' -eq $deadlineRepositoryPath)
 {
-    $deadlineRepositoryPath = Read-Host -Prompt 'Deadline 10 Repository Path'
+    $deadlineRepositoryPath = Read-Host -Prompt 'Deadline 7.2, 8, 9 or 10 Repository Path'
 }
 
 if (!(Test-Path $deadlineRepositoryPath))
@@ -98,8 +98,9 @@ if (!(Test-Path "$deadlineRepoConfig"))
 
 $repoConfig = Parse-IniFile -file $deadlineRepoConfig
 $deadlineVersion = $repoConfig["DeadlineRepository"]["Version"]
+$deadlineMajorVersion = $deadlineVersion.Split(".")[0]
 
-if (!$deadlineVersion.StartsWith("10.") -and !$deadlineVersion.StartsWith("7.2"))
+if (!$deadlineVersion.StartsWith("10.") -and !$deadlineVersion.StartsWith("7.2."))
 {
     Write-Error "Unsupported Deadline version found: $deadlineVersion"
     exit 1
@@ -129,9 +130,10 @@ try {
     exit 1
 }
 
+$installPath = "$installPath $deadlineMajorVersion"
 Create-Directory $installPath
 
-$tempPath = "${env:TEMP}\Microsoft\AzureDeadline"
+$tempPath = "${env:TEMP}\Microsoft\AzureDeadline$deadlineMajorVersion"
 if (Test-Path $tempPath)
 {
     Remove-Item $tempPath -Force -Recurse -ea stop
