@@ -54,7 +54,8 @@ function Install-Plugin-Dependencies()
     }
 
     # Set an environment variable so the plugin knows where to find them
-    [Environment]::SetEnvironmentVariable("AZURE_DEADLINE_PATH", "$installPath", "Machine")
+    [Environment]::SetEnvironmentVariable("AZURE_DEADLINE_PLUGIN_PATH", "$installPath", "Machine")
+    [Environment]::SetEnvironmentVariable("AZURE_DEADLINE_REPO_PATH", "$deadlineRepositoryPath\custom\cloud\AzureBatch", "Machine")
 }
 
 

@@ -34,16 +34,16 @@ from FranticX import Environment2
 from System.IO import *
 
 # Azure plugin dependencies
-if os.environ['AZURE_DEADLINE_PATH'] not in sys.path:
-    sys.path.insert(0, os.environ['AZURE_DEADLINE_PATH'])
-print(sys.path)
+if os.environ['AZURE_DEADLINE_PLUGIN_PATH'] not in sys.path:
+    sys.path.insert(0, os.environ['AZURE_DEADLINE_PLUGIN_PATH'])
+
+if os.environ['AZURE_DEADLINE_REPO_PATH'] not in sys.path:
+    sys.path.insert(0, os.environ['AZURE_DEADLINE_REPO_PATH'])
+
 import azure.common.credentials
 import azure.batch.batch_service_client as batchsc
 import azure.batch.models as batchmodels
 
-# Local plugin imports
-if os.path.join(os.path.dirname(__file__)) not in sys.path:
-    sys.path.insert(1, os.path.join(os.path.dirname(__file__)))
 import pluginconfig
 import mappers
 import images
@@ -66,11 +66,14 @@ class AzureBatchCloudPlugin(CloudPluginWrapper):
         self.GetActiveInstancesCallback += self.GetActiveInstances
         self.TerminateInstancesCallback += self.TerminateInstances
         self.GetHostnameCallback += self.GetHostname
-        self.CreateImageCallback += self.CreateImage
-        self.GetImageSourcesCallback += self.ImageSources
         self.StopInstancesCallback += self.StopInstances
         self.StartInstancesCallback += self.StartInstances
         self.RebootInstancesCallback += self.RebootInstances
+        try:
+            self.CreateImageCallback += self.CreateImage
+            self.GetImageSourcesCallback += self.ImageSources
+        except:
+            pass
         self.batch_config = None
         self.batch_client = None
 
