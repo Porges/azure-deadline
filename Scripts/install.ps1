@@ -99,7 +99,7 @@ if (!(Test-Path "$deadlineRepoConfig"))
 $repoConfig = Parse-IniFile -file $deadlineRepoConfig
 $deadlineVersion = $repoConfig["DeadlineRepository"]["Version"]
 
-if (!$deadlineVersion.StartsWith("10."))
+if (!$deadlineVersion.StartsWith("10.") -and !$deadlineVersion.StartsWith("7.2"))
 {
     Write-Error "Unsupported Deadline version found: $deadlineVersion"
     exit 1
