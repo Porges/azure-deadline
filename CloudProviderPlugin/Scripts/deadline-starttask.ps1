@@ -159,36 +159,8 @@ if ('' -ne $nfsShares)
 # Persist the hostname so we can fetch it later
 & hostname > hostname.txt
 
-$baseArgs = @("--mode", "unattended", "--debuglevel", "4", "--repositorydir", "`"$deadlineRepositoryPath`"", "--region", "`"$deadlineRegion`"", "--slavestartup", "true", "--serviceuser", "`"$deadlineServiceUserName`"", "--servicepassword", "`"$($deadlineServiceUserPassword.SecretValueText)`"", "--launcherservice", "true")
+$baseArgs = @("--mode", "unattended", "--debuglevel", "4", "--repositorydir", "`"$deadlineRepositoryPath`"", "--slavestartup", "true", "--serviceuser", "`"$deadlineServiceUserName`"", "--servicepassword", "`"$($deadlineServiceUserPassword.SecretValueText)`"", "--launcherservice", "true")
 $installerArgs = {$baseArgs}.Invoke()
-
-$certDir = "C:\Certs"
-$certPath = "$certDir\DeadlineClient.pfx"
-if ($secrets | Where-Object {$_.Name -eq "DeadlineDbClientCertificate"})
-{
-    $installerArgs.Add("--dbsslcertificate")
-    $installerArgs.Add("`"$certPath`"")
-   
-    $cert = Get-AzureKeyVaultSecret -VaultName "$keyVaultName" -Name 'DeadlineDbClientCertificate'
-    $certBytes = [System.Convert]::FromBase64String($cert.SecretValueText)
-    $certCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
-    $certCollection.Import($certBytes,$null,[System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
-    
-    $certPassword = $null
-    if (($secrets | Where-Object {$_.Name -eq "DeadlineDbClientCertificatePassword"}))
-    {
-        $certPassword = (Get-AzureKeyVaultSecret -VaultName "$keyVaultName" -Name 'DeadlineDbClientCertificatePassword').SecretValueText
-        $installerArgs.Add("--dbsslpassword")
-        $installerArgs.Add("`"$certPassword`"")
-    }
-    
-    mkdir $certDir -Force
-    takeown /R /F $certDir
-    icacls "$certDir" /grant ${deadlineServiceUserName}:`(OI`)`(CI`)R /T
-    icacls "$certDir" /remove Everyone /T
-    $protectedCertificateBytes = $certCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pkcs12, $certPassword)
-    [System.IO.File]::WriteAllBytes($certPath, $protectedCertificateBytes)
-}
 
 # Find the installer in the path
 $installer = Get-ChildItem "$installerPath" | where {$_.Name -like "DeadlineClient-*-windows-installer.exe"}
@@ -203,6 +175,37 @@ if (!$installer.FullName.ToLower().Contains("deadlineclient-7.2"))
 {
     $installerArgs.Add("--licensemode")
     $installerArgs.Add($deadlineLicenseMode)
+    
+    $installerArgs.Add("--region")
+    $installerArgs.Add($deadlineRegion)
+    
+    $certDir = "C:\Certs"
+    $certPath = "$certDir\DeadlineClient.pfx"
+    if ($secrets | Where-Object {$_.Name -eq "DeadlineDbClientCertificate"})
+    {
+        $installerArgs.Add("--dbsslcertificate")
+        $installerArgs.Add("`"$certPath`"")
+       
+        $cert = Get-AzureKeyVaultSecret -VaultName "$keyVaultName" -Name 'DeadlineDbClientCertificate'
+        $certBytes = [System.Convert]::FromBase64String($cert.SecretValueText)
+        $certCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
+        $certCollection.Import($certBytes,$null,[System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
+        
+        $certPassword = $null
+        if (($secrets | Where-Object {$_.Name -eq "DeadlineDbClientCertificatePassword"}))
+        {
+            $certPassword = (Get-AzureKeyVaultSecret -VaultName "$keyVaultName" -Name 'DeadlineDbClientCertificatePassword').SecretValueText
+            $installerArgs.Add("--dbsslpassword")
+            $installerArgs.Add("`"$certPassword`"")
+        }
+        
+        mkdir $certDir -Force
+        takeown /R /F $certDir
+        icacls "$certDir" /grant ${deadlineServiceUserName}:`(OI`)`(CI`)R /T
+        icacls "$certDir" /remove Everyone /T
+        $protectedCertificateBytes = $certCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pkcs12, $certPassword)
+        [System.IO.File]::WriteAllBytes($certPath, $protectedCertificateBytes)
+    }
 }
 
 if ('' -ne $deadlineLicenseServer)
