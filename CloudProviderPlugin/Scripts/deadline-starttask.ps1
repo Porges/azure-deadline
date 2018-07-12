@@ -239,12 +239,14 @@ else
     }
 }
 
+$deadlinePath = (Get-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name DEADLINE_PATH).DEADLINE_PATH
+
 if ('' -ne $deadlineGroups)
 {
     $tokens = $deadlineGroups.Split(";")
     $tokens | ForEach {
             Write-Host "Adding slave to group $_"
-            & cmd.exe /c "C:\Program Files\Thinkbox\Deadline10\bin\deadlinecommand" SetGroupsForSlave $env:COMPUTERNAME $_
+            & cmd.exe /c "$deadlinePath\deadlinecommand" SetGroupsForSlave $env:COMPUTERNAME $_
     }
 }
 
@@ -253,6 +255,6 @@ if ('' -ne $deadlinePools)
     $tokens = $deadlinePools.Split(";")
     $tokens | ForEach {
             Write-Host "Adding slave to pool $_"
-            & cmd.exe /c "C:\Program Files\Thinkbox\Deadline10\bin\deadlinecommand" SetPoolsForSlave $env:COMPUTERNAME $_
+            & cmd.exe /c "$deadlinePath\deadlinecommand" SetPoolsForSlave $env:COMPUTERNAME $_
     }
 }
