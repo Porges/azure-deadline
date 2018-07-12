@@ -159,7 +159,7 @@ if ('' -ne $nfsShares)
 # Persist the hostname so we can fetch it later
 & hostname > hostname.txt
 
-$baseArgs = @("--mode", "unattended", "--debuglevel", "4", "--repositorydir", "`"$deadlineRepositoryPath`"", "--licensemode", $deadlineLicenseMode, "--region", "`"$deadlineRegion`"", "--slavestartup", "true", "--serviceuser", "`"$deadlineServiceUserName`"", "--servicepassword", "`"$($deadlineServiceUserPassword.SecretValueText)`"", "--launcherservice", "true")
+$baseArgs = @("--mode", "unattended", "--debuglevel", "4", "--repositorydir", "`"$deadlineRepositoryPath`"", "--region", "`"$deadlineRegion`"", "--slavestartup", "true", "--serviceuser", "`"$deadlineServiceUserName`"", "--servicepassword", "`"$($deadlineServiceUserPassword.SecretValueText)`"", "--launcherservice", "true")
 $installerArgs = {$baseArgs}.Invoke()
 
 $certDir = "C:\Certs"
@@ -197,6 +197,12 @@ if (-Not $installer)
     Write-Host "Cannot find Deadline client installer in app package.  Files found:"
     Get-ChildItem "$installerPath"
     exit 1
+}
+
+if (!$installer.FullName.ToLower().Contains("deadlineclient-7.2"))
+{
+    $installerArgs.Add("--licensemode")
+    $installerArgs.Add($deadlineLicenseMode)
 }
 
 if ('' -ne $deadlineLicenseServer)

@@ -105,11 +105,14 @@ class AzureBatchCloudPlugin(CloudPluginWrapper):
         del self.GetActiveInstancesCallback
         del self.TerminateInstancesCallback
         del self.GetHostnameCallback
-        del self.CreateImageCallback
-        del self.GetImageSourcesCallback
         del self.StopInstancesCallback
         del self.StartInstancesCallback
         del self.RebootInstancesCallback
+        try:
+            del self.CreateImageCallback
+            del self.GetImageSourcesCallback
+        except:
+            pass
 
     def VerifyAccess(self):
         client = self._get_batch_client()
