@@ -29,17 +29,19 @@ import traceback
 import uuid
 
 from Deadline.Scripting import *
-from Deadline.Cloud import CloudPluginWrapper, CloudInstance, InstanceStatus, OSImage, HardwareType
-from FranticX import Environment2
 from System.IO import *
 
-# Azure plugin dependencies
-if os.environ['AZURE_DEADLINE_PLUGIN_PATH'] not in sys.path:
-    sys.path.insert(0, os.environ['AZURE_DEADLINE_PLUGIN_PATH'])
+# Add the AzureBatch plugin and dependencies path to PYTHONPATH
+cloudPluginPath = Path.Combine( RepositoryUtils.GetRootDirectory(), "custom", "cloud", "AzureBatch" )
+sitePackagesPath = Path.Combine( cloudPluginPath, "site-packages" )
+if not cloudPluginPath in sys.path:
+    sys.path.insert(0, cloudPluginPath)
+if not sitePackagesPath in sys.path:
+    sys.path.insert(0, sitePackagesPath)
 
-if os.environ['AZURE_DEADLINE_REPO_PATH'] not in sys.path:
-    sys.path.insert(0, os.environ['AZURE_DEADLINE_REPO_PATH'])
-
+from Deadline.Cloud import CloudPluginWrapper, CloudInstance, InstanceStatus, OSImage, HardwareType
+from FranticX import Environment2
+    
 import azure.common.credentials
 import azure.batch.batch_service_client as batchsc
 import azure.batch.models as batchmodels
@@ -105,11 +107,14 @@ class AzureBatchCloudPlugin(CloudPluginWrapper):
         del self.GetActiveInstancesCallback
         del self.TerminateInstancesCallback
         del self.GetHostnameCallback
-        del self.CreateImageCallback
-        del self.GetImageSourcesCallback
         del self.StopInstancesCallback
         del self.StartInstancesCallback
         del self.RebootInstancesCallback
+        try:
+            del self.CreateImageCallback
+            del self.GetImageSourcesCallback
+        except:
+            pass
 
     def VerifyAccess(self):
         client = self._get_batch_client()

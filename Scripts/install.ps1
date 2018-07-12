@@ -1,6 +1,5 @@
 ﻿Param(
     [string]$deadlineRepositoryPath = $null,
-    [string]$installPath = "$env:ProgramFiles\Microsoft\Azure Deadline",
     [switch]$clientOnlyInstall
 )
 
@@ -44,8 +43,8 @@ function Create-Directory($dir)
 function Install-Plugin-Dependencies()
 {
     # Install the Azure cloud provider plugin dependencies
-    Write-Host "Installing Azure Cloud Plugin dependencies to $installPath..."
-    & pip.exe install --target="$installPath" --upgrade -r "$tempPath\azure-deadline-$version\CloudProviderPlugin\requirements.txt" 2>&1 | Out-File "$tempPath\pip.log"
+    Write-Host "Installing Azure Cloud Plugin dependencies to $sitePackagesPath..."
+    & pip.exe install --target="$sitePackagesPath" --upgrade -r "$tempPath\azure-deadline-$version\CloudProviderPlugin\requirements.txt" 2>&1 | Out-File "$tempPath\pip.log"
     if ($LASTEXITCODE -ne 0)
     {
         Write-Error "An error occurred installing one or more packages."
@@ -53,18 +52,19 @@ function Install-Plugin-Dependencies()
         exit 1
     }
 
+    # Keyring causes issues in Deadline 7.2 and isn't needed any more.
+    Remove-Item -Recurse -Force "$sitePackagesPath\keyring"
+    
     # Set an environment variable so the plugin knows where to find them
-    [Environment]::SetEnvironmentVariable("AZURE_DEADLINE_PLUGIN_PATH", "$installPath", "Machine")
-    [Environment]::SetEnvironmentVariable("AZURE_DEADLINE_REPO_PATH", "$deadlineRepositoryPath\custom\cloud\AzureBatch", "Machine")
+    [Environment]::SetEnvironmentVariable("AZURE_DEADLINE_PLUGIN_PATH", "$deadlineCloudPluginPath", "Machine")
 }
 
 
 function Install-CloudProvider-Plugin()
 {
     # Install the cloud plugin into the Deadline repository
-    $deadlineCloudPluginPath = "$deadlineRepositoryPath\custom\cloud\AzureBatch"
-    Create-Directory $deadlineCloudPluginPath
     Write-Host "Installing Azure cloud provider plugin to $deadlineCloudPluginPath..."
+    Create-Directory $deadlineCloudPluginPath
     Copy-Item -Path "$tempPath\azure-deadline-$version\CloudProviderPlugin\*" -Destination "$deadlineCloudPluginPath" -Exclude "test_*.py" -Force
 }
 
@@ -131,8 +131,8 @@ try {
     exit 1
 }
 
-$installPath = "$installPath $deadlineMajorVersion"
-Create-Directory $installPath
+$deadlineCloudPluginPath = "$deadlineRepositoryPath\custom\cloud\AzureBatch"
+$sitePackagesPath = "$deadlineCloudPluginPath\site-packages"
 
 $tempPath = "${env:TEMP}\Microsoft\AzureDeadline$deadlineMajorVersion"
 if (Test-Path $tempPath)
@@ -142,7 +142,7 @@ if (Test-Path $tempPath)
 
 Create-Directory $tempPath
 
-$version = "0.1"
+$version = "0.2"
 $file = "v${version}.zip"
 $url = "https://github.com/Azure/azure-deadline/archive/$file"
 $localFile = "$tempPath\$file"
