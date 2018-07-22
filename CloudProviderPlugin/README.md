@@ -148,7 +148,7 @@ We need to add the following secrets that are required by the Deadline slaves.  
 | DeadlineServiceUserName | Secret | Windows | Username that the deadline slave service will run as.  This can either be a local or AD user.  If AD, this user must have permission to access the Deadline repository share. |
 | DeadlineServiceUserPassword | Secret | Windows |The password for the above service user|
 | DeadlineDbClientCertificate | Certificate | Windows & Linux |The Deadline database certificate PFX, if used.|
-| DeadlineDbClientCertificatePassword| Secret | Windows & linux|The Deadline database certificate password, if used.|
+| DeadlineDbClientCertificatePassword| Secret | Windows & Linux|The Deadline database certificate password, if used.|
 | DeadlineServiceUserNameLinux | Secret | Linux | Username the daemon will run as.|
 | DeadlineServiceUserIdLinux | Secret | Linux | UID for the above user, if required|
 | DeadlineServiceGroupLinux | Secret | Linux | Group the daemon will run under|
